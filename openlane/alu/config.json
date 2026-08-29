@@ -1,0 +1,26 @@
+{
+  "DESIGN_NAME": "alu",
+  "VERILOG_FILES": "dir::../../rtl/core/alu.v",
+  "CLOCK_PORT": null,
+  "CLOCK_PERIOD": 10,
+  "FP_SIZING": "absolute",
+  "DIE_AREA": "0 0 200 200",
+
+  "_comment": [
+    "Purely combinational block: no CLOCK_PORT/CLOCK_NET, OpenLane will run",
+    "it clockless. This config exists only to prove the Sky130 flow (synth",
+    "-> floorplan -> place -> route -> DRC/LVS) end-to-end on a trivial",
+    "block before the full pipelined core is written. Once rtl/core/alu.v",
+    "is stable, run this first as a smoke test:",
+    "  docker run ... flow.tcl -design alu",
+    "Real per-stage configs (fetch, decode, execute, mem, wb, and the full",
+    "pipelined core) get their own directories here once the RTL exists;",
+    "do NOT try to write the full-core config yet -- CLOCK_PORT, PDN,",
+    "macro placement, and timing constraints only make sense once the",
+    "pipeline register boundaries (Phase 4) are finalized."
+  ],
+
+  "PL_TARGET_DENSITY": 0.45,
+  "SYNTH_STRATEGY": "AREA 0",
+  "RUN_KLAYOUT_XOR": true
+}
