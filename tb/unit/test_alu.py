@@ -1,13 +1,3 @@
-"""
-Unit test for alu.v — Phase 2 building block.
-
-Pattern established here (reuse for every future unit test):
-  1. Directed edge cases first (overflow, sign boundaries, shift-by-0/31).
-  2. Randomized testing against a Python golden model.
-  3. Report a summary so failures are easy to localize.
-
-Run with:  make -C sim
-"""
 import random
 
 import cocotb
@@ -68,7 +58,6 @@ async def check(dut, a, b, op, label=""):
 
 @cocotb.test()
 async def test_alu_directed(dut):
-    """Edge cases: overflow, sign boundary, shift by 0 and 31, equal operands."""
     cases = [
         (0x7FFFFFFF, 1, ALU_ADD, "signed overflow"),
         (0x80000000, 0xFFFFFFFF, ALU_ADD, "unsigned wrap"),
@@ -86,7 +75,6 @@ async def test_alu_directed(dut):
 
 @cocotb.test()
 async def test_alu_random(dut):
-    """Randomized coverage across all ops."""
     random.seed(6004)
     ops = [ALU_ADD, ALU_SUB, ALU_SLL, ALU_SLT, ALU_SLTU,
            ALU_XOR, ALU_SRL, ALU_SRA, ALU_OR, ALU_AND]

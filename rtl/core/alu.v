@@ -1,9 +1,6 @@
 `include "rv32i_pkg.vh"
 
 // Purely combinational 32-bit ALU. No clock, no reset.
-// Kept synthesis-clean on purpose: this is the first block hardened through
-// OpenLane, so it doubles as a smoke test for the whole flow before the
-// full core exists.
 module alu (
     input  wire [31:0] a,
     input  wire [31:0] b,

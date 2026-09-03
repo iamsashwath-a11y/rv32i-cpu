@@ -69,4 +69,13 @@
 `define ALU_OR   4'd8
 `define ALU_AND  4'd9
 
+// ---------------------------------------------------------------------------
+// Internal immediate-format selector (decoder -> imm_gen). Not an ISA field.
+// ---------------------------------------------------------------------------
+`define IMM_I 3'd0
+`define IMM_S 3'd1
+`define IMM_B 3'd2
+`define IMM_U 3'd3
+`define IMM_J 3'd4
+
 `endif // RV32I_PKG_VH

@@ -20,7 +20,7 @@ tb/
                tests, riscv-arch-test compliance harness
 sim/           Cocotb/Verilator Makefile
 openlane/      One config dir per hardened design (starts with `alu/` as
-               a flow smoke test, gains a `core/` dir once Phase 4 is done)
+               a flow smoke test, gains a `core/` dir once the pipeline is done)
 scripts/       Toolchain glue (elf->hex for test programs, waveform helpers)
 docs/          Design notes, ISA subset decisions, hazard analysis
 tools/         riscv-gnu-toolchain / riscv-arch-test checkouts (gitignored)
@@ -28,30 +28,39 @@ tools/         riscv-gnu-toolchain / riscv-arch-test checkouts (gitignored)
 
 ## Status
 
-- [x] Phase 0 — scaffolding
-- [ ] Phase 1 — golden RV32I reference model
-- [x] Phase 2 — first building block: `alu.v` + `test_alu.py` (start here)
-- [ ] Phase 2 — regfile, imm_gen, decoder
-- [ ] Phase 3 — single-cycle core composed + riscv-arch-test passing
-- [ ] Phase 4 — pipeline registers inserted incrementally + hazard logic
-- [ ] Phase 5 — synthesis-clean lint pass
-- [ ] Phase 6 — OpenLane hardening, DRC/LVS clean
-- [ ] Phase 7 — STA timing closure at target frequency
+- [x] `alu.v` + `test_alu.py` — combinational ALU (add/sub/shifts/compares)
+- [x] `regfile.v` + `test_regfile.py` — 32 registers, x0 hardwiring, same-cycle write/read bypass
+- [x] `imm_gen.v` + `test_imm_gen.py` — I/S/B/U/J-type immediate extraction
+- [x] `decoder.v` + `test_decoder.py` — addi, add, sub, lw, sw, beq, lui, jal
+- [ ] Wire alu/regfile/imm_gen/decoder + PC + instruction memory into a single-cycle core
+- [ ] Add data memory (loads/stores) + branch/jump datapath wiring
+- [ ] Verify single-cycle core thoroughly (golden-model + riscv-arch-test)
+- [ ] Insert pipeline registers incrementally (IF/ID, ID/EX, EX/MEM, MEM/WB)
+- [ ] Hazard handling: forwarding, load-use stall, branch flush
+- [ ] Synthesis-clean lint pass
+- [ ] OpenLane hardening: synth -> floorplan -> place -> CTS -> route
+- [ ] DRC/LVS sign-off, timing closure
 
-## Running the ALU unit test
+## Running the unit tests
+
+Each module has its own cocotb test. From `sim/`:
 
 ```
-cd sim
-make
+make SIM=icarus MODULE=test_alu     TOPLEVEL=alu     VERILOG_SOURCES=../rtl/core/alu.v
+make SIM=icarus MODULE=test_regfile TOPLEVEL=regfile VERILOG_SOURCES=../rtl/core/regfile.v
+make SIM=icarus MODULE=test_imm_gen TOPLEVEL=imm_gen VERILOG_SOURCES=../rtl/core/imm_gen.v
+make SIM=icarus MODULE=test_decoder TOPLEVEL=decoder VERILOG_SOURCES=../rtl/core/decoder.v
 ```
+
+(Clean `sim/sim_build/` between runs of different top-level modules.)
+Drop `SIM=icarus` to default to Verilator once available in your environment.
 
 ## Design rules (kept from day one so nothing needs retrofitting for OpenLane)
 
-- Single clock domain, single synchronous active-low (or active-high — pick
-  one and never mix) reset.
-- No latches: every combinational `always @(*)` block must assign every
-  output on every path.
+- Single clock domain, single synchronous reset convention (kept consistent
+  once reset is introduced at the pipeline stage).
+- No latches: every combinational `always @(*)` block assigns every output
+  on every path.
 - No `initial` blocks in synthesizable RTL (simulation-only files are exempt
   and live under `tb/`).
 - No multi-driven nets, no combinational loops.
-- Verilator `--lint-only` must be clean before a block is considered done.

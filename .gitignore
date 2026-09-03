@@ -1,0 +1,17 @@
+# Simulation build artifacts
+sim/sim_build/
+sim/results.xml
+**/sim_build/
+**/results.xml
+
+# Python
+__pycache__/
+*.pyc
+
+# OpenLane run outputs (keep configs, ignore generated run directories)
+openlane/*/runs/
+
+# Editor/OS cruft
+.DS_Store
+.vscode/
+*.swp
