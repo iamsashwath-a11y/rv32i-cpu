@@ -32,7 +32,9 @@ tools/         riscv-gnu-toolchain / riscv-arch-test checkouts (gitignored)
 - [x] `regfile.v` + `test_regfile.py` — 32 registers, x0 hardwiring, same-cycle write/read bypass
 - [x] `imm_gen.v` + `test_imm_gen.py` — I/S/B/U/J-type immediate extraction
 - [x] `decoder.v` + `test_decoder.py` — addi, add, sub, lw, sw, beq, lui, jal
-- [ ] Wire alu/regfile/imm_gen/decoder + PC + instruction memory into a single-cycle core
+- [x] `pc.v` + `test_pc.py` — program counter, synchronous reset
+- [x] `imem.v` + `test_imem.py` — sim-only preloaded instruction memory (4-instruction test program)
+- [ ] Wire alu/regfile/imm_gen/decoder/pc/imem into a single-cycle core
 - [ ] Add data memory (loads/stores) + branch/jump datapath wiring
 - [ ] Verify single-cycle core thoroughly (golden-model + riscv-arch-test)
 - [ ] Insert pipeline registers incrementally (IF/ID, ID/EX, EX/MEM, MEM/WB)
