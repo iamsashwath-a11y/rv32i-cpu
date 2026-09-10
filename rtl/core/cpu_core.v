@@ -27,6 +27,9 @@ module cpu_core (
     wire [31:0] alu_b_input;
     wire [31:0] alu_result;
     wire        alu_zero;
+    // Data Memory Signals
+    wire [31:0] mem_read_data;
+    wire [31:0] writeback_data;
     // =========================================================================
     // 2. Program Counter Next Logic (Simple PC + 4 for today)
     // =========================================================================
@@ -73,7 +76,7 @@ module cpu_core (
         .rs1_addr(rs1),
         .rs2_addr(rs2),
         .rd_addr (rd),
-        .rd_data (alu_result), // Direct writeback from ALU result (No memory yet)
+        .rd_data (writeback_data), // Muxed: dmem read data for loads, ALU result otherwise
         .rs1_data(rs1_data),
         .rs2_data(rs2_data)
     );
@@ -91,4 +94,18 @@ module cpu_core (
         .result(alu_result),
         .zero  (alu_zero)
     );
+    // =========================================================================
+    // 5. Data Memory + Writeback Mux
+    // =========================================================================
+    // Data Memory
+    dmem u_dmem (
+        .clk       (clk),
+        .addr      (alu_result),   // ALU calculates the base + offset address
+        .write_data(rs2_data),     // rs2 holds the payload for sw
+        .mem_read  (mem_read),
+        .mem_write (mem_write),
+        .read_data (mem_read_data)
+    );
+    // Writeback Multiplexer (mem_read = 1 selects RAM data; 0 selects ALU result)
+    assign writeback_data = (mem_read) ? mem_read_data : alu_result;
 endmodule
