@@ -33,7 +33,13 @@ module cpu_core (
     // =========================================================================
     // 2. Program Counter Next Logic (Simple PC + 4 for today)
     // =========================================================================
-    assign pc_next = pc_out + 32'd4;
+    wire branch_taken = branch & alu_zero;      // beq: branch AND (rs1 == rs2)
+    wire take_jump = branch_taken;               // for now -- jal handling next
+
+    wire [31:0] pc_plus4 = pc_out + 32'd4;
+    wire [31:0] branch_target = pc_out + imm_out; // branch/jump target = PC + immediate
+
+    assign pc_next = take_jump ? branch_target : pc_plus4;
     // =========================================================================
     // 3. Module Instantiations
     // =========================================================================
