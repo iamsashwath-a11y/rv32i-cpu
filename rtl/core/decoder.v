@@ -8,6 +8,7 @@ module decoder (
     output reg         mem_read,
     output reg         mem_write,
     output reg         branch,
+    output reg         jump,
     output reg         alu_src_imm,
     output reg  [4:0]  rs1,
     output reg  [4:0]  rs2,
@@ -29,6 +30,7 @@ module decoder (
         mem_read    = 1'b0;
         mem_write   = 1'b0;
         branch      = 1'b0;
+        jump        = 1'b0;
         alu_src_imm = 1'b0;
 
         case (opcode)
@@ -78,6 +80,7 @@ module decoder (
             `OPC_JAL: begin
                 imm_type    = `IMM_J;
                 reg_write   = 1'b1;
+                jump        = 1'b1;
             end
 
             default: begin

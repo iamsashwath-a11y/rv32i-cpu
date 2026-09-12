@@ -16,6 +16,7 @@ module cpu_core (
     wire        mem_read;
     wire        mem_write;
     wire        branch;
+    wire        jump;
     wire        alu_src_imm;
     wire [4:0]  rs1;
     wire [4:0]  rs2;
@@ -31,10 +32,10 @@ module cpu_core (
     wire [31:0] mem_read_data;
     wire [31:0] writeback_data;
     // =========================================================================
-    // 2. Program Counter Next Logic (Simple PC + 4 for today)
+    // 2. Program Counter Next Logic (branch-aware)
     // =========================================================================
     wire branch_taken = branch & alu_zero;      // beq: branch AND (rs1 == rs2)
-    wire take_jump = branch_taken;               // for now -- jal handling next
+    wire take_jump = branch_taken | jump;        // beq (taken) OR jal (unconditional)
 
     wire [31:0] pc_plus4 = pc_out + 32'd4;
     wire [31:0] branch_target = pc_out + imm_out; // branch/jump target = PC + immediate
@@ -64,6 +65,7 @@ module cpu_core (
         .mem_read   (mem_read),
         .mem_write  (mem_write),
         .branch     (branch),
+        .jump       (jump),
         .alu_src_imm(alu_src_imm),
         .rs1        (rs1),
         .rs2        (rs2),
@@ -112,6 +114,10 @@ module cpu_core (
         .mem_write (mem_write),
         .read_data (mem_read_data)
     );
-    // Writeback Multiplexer (mem_read = 1 selects RAM data; 0 selects ALU result)
-    assign writeback_data = (mem_read) ? mem_read_data : alu_result;
+    // Writeback Multiplexer:
+    //   jump (jal)  -> pc_plus4 (the return address)
+    //   mem_read    -> dmem read data (a load)
+    //   otherwise   -> alu_result
+    assign writeback_data = jump ? pc_plus4 :
+                            (mem_read ? mem_read_data : alu_result);
 endmodule

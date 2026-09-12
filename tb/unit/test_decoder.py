@@ -32,6 +32,7 @@ async def get_outputs(dut, inst):
         alu_op=int(dut.alu_op.value), imm_type=int(dut.imm_type.value),
         reg_write=int(dut.reg_write.value), mem_read=int(dut.mem_read.value),
         mem_write=int(dut.mem_write.value), branch=int(dut.branch.value),
+        jump=int(dut.jump.value),
         alu_src_imm=int(dut.alu_src_imm.value), rs1=int(dut.rs1.value),
         rs2=int(dut.rs2.value), rd=int(dut.rd.value),
     )
@@ -84,7 +85,7 @@ async def test_beq(dut):
     o = await get_outputs(dut, inst)
     assert o["rs1"] == 1 and o["rs2"] == 2
     assert o["alu_op"] == ALU_SUB and o["imm_type"] == IMM_B
-    assert o["branch"] == 1 and o["reg_write"] == 0 and o["alu_src_imm"] == 0
+    assert o["branch"] == 1 and o["jump"] == 0 and o["reg_write"] == 0 and o["alu_src_imm"] == 0
 
 
 @cocotb.test()
@@ -100,4 +101,4 @@ async def test_jal(dut):
     inst = (0 << 31) | (0 << 12) | (0 << 20) | (0 << 21) | (1 << 7) | OPC_JAL
     o = await get_outputs(dut, inst)
     assert o["rd"] == 1
-    assert o["imm_type"] == IMM_J and o["reg_write"] == 1
+    assert o["imm_type"] == IMM_J and o["reg_write"] == 1 and o["jump"] == 1
